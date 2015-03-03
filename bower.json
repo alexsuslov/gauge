@@ -4,6 +4,7 @@
   "dependencies": {
     "bootstrap": "~3.2.0",
     "requirejs-text": "~2.0.14",
-    "requirejs": "~2.1.16"
+    "requirejs": "~2.1.16",
+    "svg.js": "~1.0.1"
   }
 }
