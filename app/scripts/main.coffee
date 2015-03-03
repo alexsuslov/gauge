@@ -15,22 +15,32 @@ require.config
   paths:
     jquery:     '../libs/jquery/dist/jquery'
     svg:        '../libs/svg.js/dist/svg'
-    bootstrap:  '../libs/bootstrap/dist/js/bootstrap'
-    affix:      '../libs/bootstrap/js/affix'
-    alert:      '../libs/bootstrap/js/alert'
-    dropdown:   '../libs/bootstrap/js/dropdown'
-    tooltip:    '../libs/bootstrap/js/tooltip'
-    modal:      '../libs/bootstrap/js/modal'
-    transition: '../libs/bootstrap/js/transition'
-    button:     '../libs/bootstrap/js/button'
-    popover:    '../libs/bootstrap/js/popover'
-    carousel:   '../libs/bootstrap/js/carousel'
-    scrollspy:  '../libs/bootstrap/js/scrollspy'
-    collapse:   '../libs/bootstrap/js/collapse'
-    tab:        '../libs/bootstrap/js/tab'
-    text:       '../libs/requirejs-plugins/lib/text'
+
+
+
+
 
 require ['app', 'jquery' ], (App, $)->
   gauge = new App
     el: 'gauge'
+    size:[320, 320]
+    text: '0123456'
+    demo: true
+  gauge.val 100
 
+  # плагин
+  $.fn.gauge = (opts)->
+    (
+      for el in  @
+        opts.el = el
+        new App opts
+      )
+
+  gaugeArray = $('.gauge').gauge
+    size: [240, 240]
+    demo: true
+
+  gaugeArray[0].val 50
+  gaugeArray[1].val 30
+  gaugeArray[2].val 70
+  gaugeArray[3].val 80
