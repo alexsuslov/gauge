@@ -9,9 +9,77 @@
 # color: #535353
 define ['svg'], (SVG)->
   class App
+    colors:['#535353', '#fd940a', '#fb000a']
+
+    ###*
+     * [rad description]
+     * @param  {Number} angle угол в градусах
+     * @return угол в радианах
+    ###
     rad:(angle)-> angle * Math.PI / 180
-    arc:(draw, radius, start, stop, width = 10, stroke =1, color='#535353')->
-      for angle in [start .. (start + stop)]
+
+    ###*
+     * Текст по окружности
+     * @param  {Object} draw   для рисования
+     * @param  {Stinng} text   текст который рисуем
+     * @param  {Number} radius
+     * @param  {Number} start  Start angle
+     * @param  {Number} len    length
+     * @return draw group
+    ###
+    arcText:(draw, text, radius, start, len)->
+      arcText = draw.group().x( 30).y( 30)
+      end = start + len
+      step = len / text.length
+      for angle,i in (a for a in [start ... end] by step)
+        x = radius + (radius * Math.sin @rad angle)
+        y = radius + (radius * Math.cos @rad angle)
+        arcText.circle()
+          .fill '#1c83dd'
+          .x x
+          .y y
+          .radius 16
+        arcText.text(text[i])
+          .x x - 5
+          .y y - 5
+          .fill '#f0efef'
+          .font
+            size: 16
+            family: 'Verdana'
+      arcText
+
+    ###*
+     * Засечки
+     * @param {Object} draw   для рисования
+     * @param {Number} radius
+     * @param {Number} start  Start angle
+     * @param {Number} len    length
+     * @param {[type]} count  кол-во
+     * @return {Object} draw group
+    ###
+    Lines: (draw, radius, start, len, count)->
+      Lines = draw.group()
+        .x 50
+        .y 50
+      end = start + len
+      step = len / count
+      for angle in [ start ... end] by step
+        @arc Lines, radius, angle, 0, 5
+      Lines
+
+    ###*
+     * Дуга
+     * @param  {Object} draw   для рисования
+     * @param  {Number} radius
+     * @param  {Number} start  Start angle
+     * @param  {Number} len    length
+     * @param  {[type]} width = 2 ширина дуги
+     * @param  {[type]} stroke = 2  толщина
+     * @param  {[type]} color='#535353' цвет дуги
+     * @return {Object} draw group
+    ###
+    arc:(draw, radius, start, len, width = 2, stroke =2, color='#535353')->
+      for angle in [start .. (start + len)]
         x = radius + (radius * Math.sin @rad angle)
         y = radius + (radius * Math.cos @rad angle)
         x1 = x - (width * Math.sin @rad angle)
@@ -20,65 +88,46 @@ define ['svg'], (SVG)->
           .stroke
             width: stroke
             color:color
+    ###*
+     * Дуги
+     * @param  {Object} draw   для рисования
+     * @param  {Number} radius
+     * @param  {Number} start  Start angle
+     * @param  {Number} len    length
+     * @param  {Array} colors цвета
+     * @return {Object} draw group
+    ###
+    arcs:(draw, radius, start, lens, colors)->
+      arcs = draw.group()
+        .x 60
+        .y 60
+      for len, i in lens
+        @arc arcs, radius, start, len, 2, 2, colors[i]
+        start = start + len
+      arcs
 
-    arcText:(draw, text, radius, start, stop)->
-      # for char in text
-      #   console.log char
-      step = (start + stop) / text.length + 1
-      for angle,i in (a for a in [start .. (start + stop)] by step)
-        x = radius + (radius * Math.sin @rad angle)
-        y = radius + (radius * Math.cos @rad angle)
-        # cicle = draw.circle()
-        #   .fill '#1c83dd'
-        #   .x x
-        #   .y y
-        #   .radius 4
-        draw.text(text[i])
-          .x x-4
-          .y y-6
-          .fill '#535353'
-          .font
-            size: 16
-            family: 'Verdana'
+
+    ###*
+     * Panel в сборе
+     * @param  {Object} draw   для рисования
+     * @param  {String} text
+     * @param  {Number} radius
+     * @param  {Number} start  Start angle
+     * @param  {Number} len    length
+     * @return {Object} draw group
+    ###
+    panel:(draw, text, radius, start, len)->
+      panel = draw.group()
+      step = len / text.length
+      gray = text.length - 3
+      @arcs panel, radius - 30, start, [ gray * step, step, step ], @colors
+      @Lines panel, radius - 20, start, len, text.length
+      @arcText panel, text, radius, start, len
+      panel
 
     constructor:(@opts)->
-      draw = SVG(@opts.el).size(300, 300)
-
-      Group = draw.group()
-        .x 50
-        .y 50
-
-      group = Group.group()
-        .x 10
-        .y 10
-
-      @arc group, 100, -45, -180
-      @arc group, 100, -225, -30, 15, 1 , '#fd940a'
-      @arc group, 100, -255, -30, 20, 1 , '#fb000a'
-      cicle = group.circle()
-        .fill '#1c83dd'
-        .x 100
-        .y 100
-        .radius 16
-
-      # lines
-      step = (45-285)/6
-      for angle in [ -45 .. -285] by step
-        @arc Group, 110, angle, 0, 5
-
-      # text
-      groupText = draw.group()
-        .x 30
-        .y 30
-      @arcText groupText, '0123456', 130, -45, -243
-      # draw.text('0')
-      #   .x 38
-      #   .y 221
-      #   .fill '#535353'
-      #   .font
-      #     size: 16
-      #     family: 'Verdana'
-
+      draw = SVG(@opts.el).size(400, 400)
+      @panel draw, '0123456', 130, -60, -280
       @
 
 
